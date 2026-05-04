@@ -1,4 +1,4 @@
-# Project 5 - SAT/SMT for Minesweeper
+# Project 13 - SAT/SMT for Minesweeper
 
 ## Introduction
 
