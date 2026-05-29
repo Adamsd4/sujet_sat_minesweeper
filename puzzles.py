@@ -124,7 +124,13 @@ def build_minesweeper_cnf(board: Board) -> tuple[CNF, dict[tuple[int, int], int]
     # Each unknown cell becomes one Boolean variable:
     # True = mine, False = safe.
     for cell in board.unknown_cells():
-        variables[cell] = cnf.new_var()
+        valid_cell = False
+        for (row, col) in board.neighbors(cell[0], cell[1]):
+            if board.cells[row][col] != ".":  # Si tous les voisins d'une case sont inconnus la case sera forcément non forcée, on ne l'ajoute donc pas dans les variables
+                valid_cell = True
+                break
+        if valid_cell:
+            variables[cell] = cnf.new_var()
 
     for row in range(board.height):
         for col in range(board.width):

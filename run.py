@@ -22,7 +22,7 @@ def main() -> None:
 
     # We time only the solver itself.
     start = time.perf_counter()
-    solution = solve(cnf.clauses, cnf.variable_count)
+    solution = solve(cnf.clauses.copy(), cnf.variable_count)
     elapsed = time.perf_counter() - start
 
     print("board:")
@@ -36,12 +36,26 @@ def main() -> None:
         return
 
     marks = {}
+    counter = 0
     for cell, variable in variables.items():
+        counter += 1
+        result = "not forced"
+
         # A cell is forced if one of its truth values makes the whole formula unsatisfiable.
-        if not is_satisfiable_with(cnf.clauses, cnf.variable_count, {variable: False}):
+        forced_mine = is_satisfiable_with(cnf.clauses, cnf.variable_count, {variable: False})
+        forced_safe = is_satisfiable_with(cnf.clauses, cnf.variable_count, {variable: True})
+
+        if forced_mine == "UNRESOLVED" or forced_safe == "UNRESOLVED":
+            print(f"{counter}/{cnf.variable_count} : UNRESOLVED")
+            continue
+
+        if is_satisfiable_with(cnf.clauses, cnf.variable_count, {variable: False}) is None:
             marks[cell] = "*"
-        elif not is_satisfiable_with(cnf.clauses, cnf.variable_count, {variable: True}):
+            result = "mine"
+        elif is_satisfiable_with(cnf.clauses, cnf.variable_count, {variable: True}) is None:
             marks[cell] = "s"
+            result = "safe"
+        print(f"{counter}/{cnf.variable_count} : {result}")
 
     print("forced cells (* = mine, s = safe):")
     print(render_board(board, marks))
